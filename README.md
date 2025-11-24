@@ -28,3 +28,7 @@ go run main.go
 ## Usage
 
 In Telegram, type `@your_bot_username <text>` to translate text to Spanish. The bot is restricted to respond only to the user ID specified in `TELEGRAM_USER_ID`.
+
+## Demo
+
+![Sample Run](sample_run.gif)
