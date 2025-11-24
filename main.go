@@ -44,6 +44,33 @@ func main() {
 	defer client.Close()
 
 	b.RegisterHandlerMatchFunc(func(update *models.Update) bool {
+		return update.Message != nil && update.Message.From.ID != userID
+	}, func(ctx context.Context, b *bot.Bot, update *models.Update) {
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: update.Message.Chat.ID,
+			Text:   "This bot is restricted to authorized users. Please contact the bot owner, @mjmoshiri, for further assistance.",
+		})
+	})
+
+	b.RegisterHandlerMatchFunc(func(update *models.Update) bool {
+		return update.InlineQuery != nil && update.InlineQuery.From.ID != userID
+	}, func(ctx context.Context, b *bot.Bot, update *models.Update) {
+		b.AnswerInlineQuery(ctx, &bot.AnswerInlineQueryParams{
+			InlineQueryID: update.InlineQuery.ID,
+			Results: []models.InlineQueryResult{
+				&models.InlineQueryResultArticle{
+					ID:          "1",
+					Title:       "Access Denied",
+					Description: "This bot is restricted to authorized users. Please contact the bot owner, @mjmoshiri, for further assistance.",
+					InputMessageContent: &models.InputTextMessageContent{
+						MessageText: "This bot is restricted to authorized users. Please contact the bot owner, @mjmoshiri, for further assistance.",
+					},
+				},
+			},
+		})
+	})
+
+	b.RegisterHandlerMatchFunc(func(update *models.Update) bool {
 		return update.InlineQuery != nil && update.InlineQuery.From.ID == userID
 	}, func(ctx context.Context, b *bot.Bot, update *models.Update) {
 		query := update.InlineQuery.Query

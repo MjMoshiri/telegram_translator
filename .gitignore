@@ -1,3 +1,4 @@
 .env
 translate-key.json
 telegram_translator
+*.log
