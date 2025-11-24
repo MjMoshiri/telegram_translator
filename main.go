@@ -2,17 +2,22 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 
-	translate "cloud.google.com/go/translate/apiv3"
-	translatepb "cloud.google.com/go/translate/apiv3/translatepb"
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"github.com/google/generative-ai-go/genai"
 	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 )
+
+type TranslationResult struct {
+	TranslatedText string `json:"translated_text"`
+}
 
 func main() {
 	err := godotenv.Load()
@@ -20,8 +25,7 @@ func main() {
 		log.Println("Error loading .env file, falling back to environment variables:", err)
 	}
 	telegramToken := os.Getenv("TELEGRAM_TOKEN")
-	googleCreds := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
-	projectID := os.Getenv("GOOGLE_PROJECT_ID")
+	geminiKey := os.Getenv("GEMINI_API_KEY")
 	userIDStr := os.Getenv("TELEGRAM_USER_ID")
 
 	userID, err := strconv.ParseInt(userIDStr, 10, 64)
@@ -35,13 +39,24 @@ func main() {
 	}
 
 	ctx := context.Background()
-
-	// Google Translate client
-	client, err := translate.NewTranslationClient(ctx, option.WithCredentialsFile(googleCreds))
+	client, err := genai.NewClient(ctx, option.WithAPIKey(geminiKey))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Close()
+
+	model := client.GenerativeModel("gemini-2.5-flash")
+	model.ResponseMIMEType = "application/json"
+
+	model.ResponseSchema = &genai.Schema{
+		Type: genai.TypeObject,
+		Properties: map[string]*genai.Schema{
+			"translated_text": {
+				Type: genai.TypeString,
+			},
+		},
+		Required: []string{"translated_text"},
+	}
 
 	b.RegisterHandlerMatchFunc(func(update *models.Update) bool {
 		return update.Message != nil && update.Message.From.ID != userID
@@ -78,9 +93,9 @@ func main() {
 			return
 		}
 
-		translated, err := translateText(ctx, client, projectID, query)
+		translated, err := translateText(ctx, model, query)
 		if err != nil {
-			log.Println("Translation error:", err)
+			log.Fatal("Translation error:", err)
 			translated = "Translation error"
 		}
 
@@ -101,22 +116,21 @@ func main() {
 	b.Start(ctx)
 }
 
-func translateText(ctx context.Context, client *translate.TranslationClient, projectID, text string) (string, error) {
-	req := &translatepb.TranslateTextRequest{
-		Parent:             "projects/" + projectID + "/locations/global",
-		Contents:           []string{text},
-		MimeType:           "text/plain",
-		TargetLanguageCode: "es", // translate → Spanish
-	}
-
-	resp, err := client.TranslateText(ctx, req)
+func translateText(ctx context.Context, model *genai.GenerativeModel, text string) (string, error) {
+	prompt := fmt.Sprintf("Translate the following text to Spanish: %s", text)
+	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
 	if err != nil {
 		return "", err
 	}
 
-	if len(resp.Translations) == 0 {
-		return "", nil
+	if len(resp.Candidates) > 0 && len(resp.Candidates[0].Content.Parts) > 0 {
+		jsonString := fmt.Sprint(resp.Candidates[0].Content.Parts[0])
+		var result TranslationResult
+		if err := json.Unmarshal([]byte(jsonString), &result); err != nil {
+			return "", fmt.Errorf("error unmarshaling JSON: %v", err)
+		}
+		return result.TranslatedText, nil
 	}
 
-	return resp.Translations[0].TranslatedText, nil
+	return "", nil
 }

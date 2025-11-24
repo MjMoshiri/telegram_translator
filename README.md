@@ -1,24 +1,23 @@
 # Telegram Translator Bot
 
-A simple Telegram bot that translates inline queries into Spanish using Google Cloud Translation API.
-
-## Setup
-
-1.  **Clone the repository.**
-2.  **Install dependencies:**
-    ```bash
-    go mod download
-    ```
-3.  **Configure Environment Variables:**
-    Create a `.env` file in the root directory with the following:
-    ```env
-    GOOGLE_PROJECT_ID=your-google-project-id
-    GOOGLE_APPLICATION_CREDENTIALS=path/to/your/service-account-key.json
-    TELEGRAM_TOKEN=your-telegram-bot-token
-    TELEGRAM_USER_ID=your-allowed-user-id
-    ```
-4.  **Google Cloud Credentials:**
-    Ensure you have a service account JSON key file (e.g., `translate-key.json`) and referenced it in `.env`.
+A simple Telegram bot that translates inline queries into Spanish using Google Gemini API.
+ 
+ ## Setup
+ 
+ 1.  **Clone the repository.**
+ 2.  **Install dependencies:**
+     ```bash
+     go mod download
+     ```
+ 3.  **Configure Environment Variables:**
+     Create a `.env` file in the root directory with the following:
+     ```env
+     GEMINI_API_KEY=your-gemini-api-key
+     TELEGRAM_TOKEN=your-telegram-bot-token
+     TELEGRAM_USER_ID=your-allowed-user-id
+     ```
+ 4.  **Gemini API Key:**
+     Obtain an API key from Google AI Studio and set it in `.env`.
 
 ## Running
 
