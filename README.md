@@ -15,6 +15,7 @@ A Telegram bot that translates inline queries using Google Gemini API. It suppor
     GEMINI_API_KEY=your-gemini-api-key
     TELEGRAM_TOKEN=your-telegram-bot-token
     OWNER_ID=your-telegram-user-id
+    BOT_USERNAME=your-telegram-bot-username
     ```
 4.  **Gemini API Key:**
     Obtain an API key from Google AI Studio and set it in `.env`.

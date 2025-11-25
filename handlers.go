@@ -29,7 +29,7 @@ func handleAddUser(ctx context.Context, b *bot.Bot, update *models.Update) {
 		b.SendMessage(ctx, &bot.SendMessageParams{ChatID: update.Message.Chat.ID, Text: "Error adding user"})
 		return
 	}
-	b.SendMessage(ctx, &bot.SendMessageParams{ChatID: update.Message.Chat.ID, Text: fmt.Sprintf("User %d added successfully. Please instruct them to contact @InLineTranslatorBot to set their translation language.", id)})
+	b.SendMessage(ctx, &bot.SendMessageParams{ChatID: update.Message.Chat.ID, Text: fmt.Sprintf("User %d added successfully. Please instruct them to contact @%s to set their translation language.", id, BotUsername)})
 }
 
 func handleRemoveUser(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -78,7 +78,7 @@ func handleLanguage(ctx context.Context, b *bot.Bot, update *models.Update) {
 	}
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
-		Text:   fmt.Sprintf("Language set to %s. You can now use the bot in any chat by typing @InLineTranslatorBot <text to translate> to get an inline translation.", validLangs[lang]),
+		Text:   fmt.Sprintf("Language set to %s. You can now use the bot in any chat by typing @%s <text to translate> to get an inline translation.", validLangs[lang], BotUsername),
 	})
 }
 

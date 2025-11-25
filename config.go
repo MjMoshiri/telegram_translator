@@ -12,6 +12,7 @@ var (
 	OwnerID       int64
 	TelegramToken string
 	GeminiKey     string
+	BotUsername   string
 )
 
 func LoadConfig() {
@@ -35,6 +36,10 @@ func LoadConfig() {
 		log.Fatal("OWNER_ID is not set")
 	}
 
+	BotUsername = os.Getenv("BOT_USERNAME")
+	if BotUsername == "" {
+		log.Fatal("BOT_USERNAME is not set")
+	}
 	var parseErr error
 	OwnerID, parseErr = strconv.ParseInt(ownerIDStr, 10, 64)
 	if parseErr != nil {
