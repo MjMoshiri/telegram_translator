@@ -2,3 +2,4 @@
 translate-key.json
 telegram_translator
 *.log
+bot.db

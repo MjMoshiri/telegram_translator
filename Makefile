@@ -1,10 +1,10 @@
 BINARY_NAME=telegram_translator
 
 build:
-	go build -ldflags="-s -w" -o $(BINARY_NAME) main.go
+	go build -ldflags="-s -w" -o $(BINARY_NAME) .
 
 run:
-	go run main.go
+	go run .
 
 clean:
 	rm -f $(BINARY_NAME)

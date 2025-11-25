@@ -7,6 +7,7 @@ require github.com/go-telegram/bot v1.17.0
 require (
 	github.com/google/generative-ai-go v0.20.1
 	github.com/joho/godotenv v1.5.1
+	github.com/mattn/go-sqlite3 v1.14.32
 	google.golang.org/api v0.256.0
 )
 
